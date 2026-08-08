@@ -1,0 +1,96 @@
+{
+  "id": "bingo-registro-wf-0001",
+  "name": "Bingo - Registro (POST -> Google Sheets)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bingo-registro",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1f7c1b1a-0000-4000-8000-000000000001",
+      "name": "Webhook Registro",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "bingo-registro-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "nombre", "type": "string", "value": "={{ $json.body.nombre }}" },
+            { "id": "a2", "name": "cedula", "type": "string", "value": "={{ $json.body.cedula }}" },
+            { "id": "a3", "name": "celular", "type": "string", "value": "={{ $json.body.celular }}" },
+            { "id": "a4", "name": "edad", "type": "string", "value": "={{ $json.body.edad }}" },
+            { "id": "a5", "name": "direccion", "type": "string", "value": "={{ $json.body.direccion }}" },
+            { "id": "a6", "name": "barrio", "type": "string", "value": "={{ $json.body.barrio }}" },
+            { "id": "a7", "name": "profesion", "type": "string", "value": "={{ $json.body.profesion }}" },
+            { "id": "a8", "name": "lugarVotacion", "type": "string", "value": "={{ $json.body.lugarVotacion }}" },
+            { "id": "a9", "name": "autorizacionDatos", "type": "boolean", "value": "={{ $json.body.autorizacionDatos }}" },
+            { "id": "a10", "name": "idTarjeta", "type": "string", "value": "={{ $json.body.idTarjeta }}" },
+            { "id": "a11", "name": "evento", "type": "string", "value": "={{ $json.body.evento }}" },
+            { "id": "a12", "name": "candidato", "type": "string", "value": "={{ $json.body.candidato }}" },
+            { "id": "a13", "name": "fecha", "type": "string", "value": "={{ $json.body.fecha }}" },
+            { "id": "a14", "name": "registradoEn", "type": "string", "value": "={{ $json.body.registradoEn }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f7c1b1a-0000-4000-8000-000000000002",
+      "name": "Preparar Datos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Registros",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "1f7c1b1a-0000-4000-8000-000000000003",
+      "name": "Guardar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {}
+      },
+      "id": "1f7c1b1a-0000-4000-8000-000000000004",
+      "name": "Responder OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Registro": { "main": [[{ "node": "Preparar Datos", "type": "main", "index": 0 }]] },
+    "Preparar Datos": { "main": [[{ "node": "Guardar en Google Sheets", "type": "main", "index": 0 }]] },
+    "Guardar en Google Sheets": { "main": [[{ "node": "Responder OK", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

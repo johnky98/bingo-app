@@ -1,0 +1,71 @@
+{
+  "name": "Bingo - Conteo (GET -> total desde Google Sheets)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "bingo-conteo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "2a8d2c2b-0000-4000-8000-000000000001",
+      "name": "Webhook Conteo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "bingo-conteo-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Registros",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "2a8d2c2b-0000-4000-8000-000000000002",
+      "name": "Leer Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { total: items.length } }];"
+      },
+      "id": "2a8d2c2b-0000-4000-8000-000000000003",
+      "name": "Contar Filas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"total\": $json.total } }}",
+        "options": {}
+      },
+      "id": "2a8d2c2b-0000-4000-8000-000000000004",
+      "name": "Responder Conteo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Conteo": { "main": [[{ "node": "Leer Google Sheets", "type": "main", "index": 0 }]] },
+    "Leer Google Sheets": { "main": [[{ "node": "Contar Filas", "type": "main", "index": 0 }]] },
+    "Contar Filas": { "main": [[{ "node": "Responder Conteo", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
