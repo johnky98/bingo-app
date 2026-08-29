@@ -262,9 +262,14 @@
 
   <!-- HISTORIAL DE GANADORES -->
   <div class="max-w-6xl w-full mx-auto mt-8 bg-brandCard/80 border border-purple-900/40 p-6 rounded-3xl shadow-2xl backdrop-blur-sm">
-    <h2 class="text-base font-bold text-white flex items-center gap-2 mb-3">
-      <span>📜</span> Historial de Ganadores
-    </h2>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-base font-bold text-white flex items-center gap-2">
+        <span>📜</span> Historial de Ganadores
+      </h2>
+      <button onclick="borrarHistorialGanadores()" class="text-xs text-purple-300 hover:text-white underline tracking-wide transition">
+        🗑️ Borrar historial
+      </button>
+    </div>
     <div id="lista-historial-ganadores" class="text-sm text-purple-200 space-y-1">
       Aún no hay ganadores registrados.
     </div>
@@ -682,6 +687,14 @@
     function refrescarVerificacionSiHayTablaVisible() {
       if (document.getElementById('input-id-tabla').value.trim() !== '' && document.getElementById('resultado-verificacion').innerHTML !== '') {
         verificarTabla();
+      }
+    }
+
+    function borrarHistorialGanadores() {
+      if (confirm("¿Borrar el historial de ganadores? Las balotas ya cantadas y la ronda actual no se tocan.")) {
+        historialGanadores = [];
+        guardarHistorialGanadores();
+        renderHistorialGanadores();
       }
     }
 
