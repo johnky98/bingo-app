@@ -1,5 +1,6 @@
 {
-  "name": "Bingo - Conteo (GET -> total desde Google Sheets)",
+  "id": "bingo-conteo-wf-0001",
+  "name": "Bingo - Conteo (GET -> total desde Data Table)",
   "nodes": [
     {
       "parameters": {
@@ -17,24 +18,20 @@
     },
     {
       "parameters": {
-        "resource": "sheet",
-        "operation": "read",
-        "documentId": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
           "__rl": true,
-          "value": "12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0",
-          "mode": "id"
+          "mode": "id",
+          "value": "4jfby1bxzFbhu20T"
         },
-        "sheetName": {
-          "__rl": true,
-          "value": "Registros",
-          "mode": "name"
-        },
-        "options": {}
+        "returnAll": true,
+        "filters": { "conditions": [] }
       },
       "id": "2a8d2c2b-0000-4000-8000-000000000002",
-      "name": "Leer Google Sheets",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
+      "name": "Leer Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
       "position": [460, 300]
     },
     {
@@ -61,11 +58,11 @@
     }
   ],
   "connections": {
-    "Webhook Conteo": { "main": [[{ "node": "Leer Google Sheets", "type": "main", "index": 0 }]] },
-    "Leer Google Sheets": { "main": [[{ "node": "Contar Filas", "type": "main", "index": 0 }]] },
+    "Webhook Conteo": { "main": [[{ "node": "Leer Data Table", "type": "main", "index": 0 }]] },
+    "Leer Data Table": { "main": [[{ "node": "Contar Filas", "type": "main", "index": 0 }]] },
     "Contar Filas": { "main": [[{ "node": "Responder Conteo", "type": "main", "index": 0 }]] }
   },
-  "active": false,
+  "active": true,
   "settings": { "executionOrder": "v1" },
   "pinData": {}
 }

@@ -1,58 +1,75 @@
 {
-  "id": "bingo-registro-wf-0001",
-  "name": "Bingo - Registro (POST -> Google Sheets)",
+  "id": "bingo-exportar-wf-0001",
+  "name": "Bingo - Exportar a Sheets (GET -> nueva hoja filtrada por evento)",
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "bingo-registro",
+        "httpMethod": "GET",
+        "path": "bingo-exportar",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "1f7c1b1a-0000-4000-8000-000000000001",
-      "name": "Webhook Registro",
+      "id": "3b9f4c1a-0000-4000-8000-000000000001",
+      "name": "Webhook Exportar",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 300],
-      "webhookId": "bingo-registro-webhook"
+      "position": [240, 300]
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "a1", "name": "nombre", "type": "string", "value": "={{ $json.body.nombre }}" },
-            { "id": "a2", "name": "cedula", "type": "string", "value": "={{ $json.body.cedula }}" },
-            { "id": "a3", "name": "celular", "type": "string", "value": "={{ $json.body.celular }}" },
-            { "id": "a4", "name": "edad", "type": "string", "value": "={{ $json.body.edad }}" },
-            { "id": "a5", "name": "direccion", "type": "string", "value": "={{ $json.body.direccion }}" },
-            { "id": "a6", "name": "barrio", "type": "string", "value": "={{ $json.body.barrio }}" },
-            { "id": "a7", "name": "profesion", "type": "string", "value": "={{ $json.body.profesion }}" },
-            { "id": "a9", "name": "autorizacionDatos", "type": "boolean", "value": "={{ $json.body.autorizacionDatos }}" },
-            { "id": "a10", "name": "idTarjeta", "type": "string", "value": "={{ $json.body.idTarjeta }}" },
-            { "id": "a15", "name": "lote", "type": "string", "value": "={{ $json.body.lote }}" },
-            { "id": "a11", "name": "evento", "type": "string", "value": "={{ $json.body.evento }}" },
-            { "id": "a12", "name": "candidato", "type": "string", "value": "={{ $json.body.candidato }}" },
-            { "id": "a13", "name": "fecha", "type": "string", "value": "={{ $json.body.fecha }}" },
-            { "id": "a14", "name": "registradoEn", "type": "string", "value": "={{ $json.body.registradoEn }}" }
+            { "id": "n1", "name": "eventoFiltro", "type": "string", "value": "={{ $json.query?.evento ?? \"\" }}" },
+            { "id": "n2", "name": "nombreHoja", "type": "string", "value": "=Export - {{ $json.query?.evento ?? \"sin-evento\" }} - {{ $now.toFormat(\"yyyy-MM-dd_HHmm\") }}" }
           ]
         },
         "options": {}
       },
-      "id": "1f7c1b1a-0000-4000-8000-000000000002",
-      "name": "Preparar Datos",
+      "id": "3b9f4c1a-0000-4000-8000-000000000002",
+      "name": "Preparar Nombre Hoja",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [460, 300]
     },
     {
       "parameters": {
+        "resource": "sheet",
+        "operation": "create",
+        "documentId": { "__rl": true, "mode": "id", "value": "12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0" },
+        "title": "={{ $json.nombreHoja }}",
+        "options": {}
+      },
+      "id": "3b9f4c1a-0000-4000-8000-000000000003",
+      "name": "Crear Hoja",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
         "resource": "row",
-        "operation": "insert",
-        "dataTableId": {
-          "__rl": true,
-          "mode": "id",
-          "value": "4jfby1bxzFbhu20T"
+        "operation": "get",
+        "dataTableId": { "__rl": true, "mode": "id", "value": "4jfby1bxzFbhu20T" },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            { "keyName": "evento", "condition": "eq", "keyValue": "={{ $('Webhook Exportar').item.json.query.evento }}" }
+          ]
         },
+        "returnAll": true
+      },
+      "id": "3b9f4c1a-0000-4000-8000-000000000004",
+      "name": "Leer Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": { "__rl": true, "mode": "id", "value": "12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0" },
+        "sheetName": { "__rl": true, "mode": "name", "value": "={{ $('Preparar Nombre Hoja').item.json.nombreHoja }}" },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -65,7 +82,6 @@
             "profesion": "={{ $json.profesion }}",
             "autorizacionDatos": "={{ $json.autorizacionDatos }}",
             "idTarjeta": "={{ $json.idTarjeta }}",
-            "lote": "={{ $json.lote }}",
             "evento": "={{ $json.evento }}",
             "candidato": "={{ $json.candidato }}",
             "fecha": "={{ $json.fecha }}",
@@ -82,7 +98,6 @@
             { "id": "profesion", "displayName": "profesion", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
             { "id": "autorizacionDatos", "displayName": "autorizacionDatos", "type": "boolean", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
             { "id": "idTarjeta", "displayName": "idTarjeta", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
-            { "id": "lote", "displayName": "lote", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
             { "id": "evento", "displayName": "evento", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
             { "id": "candidato", "displayName": "candidato", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
             { "id": "fecha", "displayName": "fecha", "type": "string", "required": false, "defaultMatch": false, "display": true, "canBeUsedToMatch": true },
@@ -91,29 +106,31 @@
         },
         "options": {}
       },
-      "id": "1f7c1b1a-0000-4000-8000-000000000003",
-      "name": "Guardar en Data Table",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1.1,
-      "position": [680, 300]
+      "id": "3b9f4c1a-0000-4000-8000-000000000005",
+      "name": "Escribir Filas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1120, 300]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { \"ok\": true } }}",
+        "responseBody": "={{ { \"exportado\": true, \"hoja\": $('Preparar Nombre Hoja').item.json.nombreHoja, \"linkHoja\": \"https://docs.google.com/spreadsheets/d/12vm4vfqLUF4S2E4NC6nKdnFyo1Q4sHGxZM_tQR8G5t0/edit\" + ($('Crear Hoja').item.json.replies && $('Crear Hoja').item.json.replies[0] && $('Crear Hoja').item.json.replies[0].addSheet ? \"#gid=\" + $('Crear Hoja').item.json.replies[0].addSheet.properties.sheetId : \"\") } }}",
         "options": {}
       },
-      "id": "1f7c1b1a-0000-4000-8000-000000000004",
-      "name": "Responder OK",
+      "id": "3b9f4c1a-0000-4000-8000-000000000006",
+      "name": "Responder Export",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [900, 300]
+      "position": [1340, 300]
     }
   ],
   "connections": {
-    "Webhook Registro": { "main": [[{ "node": "Preparar Datos", "type": "main", "index": 0 }]] },
-    "Preparar Datos": { "main": [[{ "node": "Guardar en Data Table", "type": "main", "index": 0 }]] },
-    "Guardar en Data Table": { "main": [[{ "node": "Responder OK", "type": "main", "index": 0 }]] }
+    "Webhook Exportar": { "main": [[{ "node": "Preparar Nombre Hoja", "type": "main", "index": 0 }]] },
+    "Preparar Nombre Hoja": { "main": [[{ "node": "Crear Hoja", "type": "main", "index": 0 }]] },
+    "Crear Hoja": { "main": [[{ "node": "Leer Data Table", "type": "main", "index": 0 }]] },
+    "Leer Data Table": { "main": [[{ "node": "Escribir Filas", "type": "main", "index": 0 }]] },
+    "Escribir Filas": { "main": [[{ "node": "Responder Export", "type": "main", "index": 0 }]] }
   },
   "active": true,
   "settings": { "executionOrder": "v1" },

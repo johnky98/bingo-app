@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo Actitud Positiva - Registros</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            morado: '#2E1065',
+            moradoOscuro: '#1E0A47',
+            naranja: '#F5711B',
+            crema: '#EDE7D9',
+            cremaClara: '#F7F3E8',
+            dorado: '#C9982B',
+            rojoChip: '#D84343',
+          },
+          fontFamily: {
+            display: ['Arial Black', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .hidden { display: none !important; }
+    body { background: linear-gradient(180deg, #1E0A47 0%, #2E1065 100%); min-height: 100vh; }
+  </style>
+</head>
+<body class="text-cremaClara font-sans">
+
+  <!-- Marca, igual que en el resto del sistema -->
+  <div class="max-w-6xl mx-auto px-4 pt-6 md:pt-8 flex items-center justify-between mb-4">
+    <div class="flex items-center gap-3">
+      <span class="bg-naranja text-cremaClara italic font-extrabold tracking-wide text-sm md:text-base px-4 py-1.5 rounded-sm shadow">
+        ACTITUD POSITIVA
+      </span>
+      <span class="hidden sm:inline text-cremaClara/70 text-sm md:text-base tracking-widest font-semibold">BINGO</span>
+    </div>
+    <div class="font-display font-black text-xl md:text-2xl tracking-wide">
+      <span class="text-naranja">A</span><span class="text-morado bg-cremaClara px-0.5 rounded-sm">P</span>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 mb-6">
+    <a href="../index.html" class="text-sm text-cremaClara/80 hover:text-cremaClara underline underline-offset-4 transition">← Volver al Menú Principal</a>
+  </div>
+
+  <!-- BARRA DE CONTROL -->
+  <div class="max-w-6xl mx-auto px-4 mb-6">
+    <div class="bg-moradoOscuro/90 border border-cremaClara/10 rounded-2xl p-6 shadow-xl">
+      <h2 class="font-display font-black text-lg mb-1">🪑 Sala de Espera — Registros</h2>
+      <p class="text-xs text-cremaClara/70 mb-4">Vigila en vivo quiénes se han registrado, antes de arrancar el juego. Se actualiza sola cada pocos segundos.</p>
+
+      <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+        <div class="flex flex-col flex-1">
+          <label class="text-[10px] uppercase font-bold text-dorado mb-1">Evento</label>
+          <input id="input-evento" type="text" value="Bingo Actitud Positiva"
+            class="bg-moradoOscuro border border-cremaClara/20 rounded-lg px-3 py-2 text-sm text-cremaClara outline-none">
+        </div>
+        <div class="flex flex-col flex-1">
+          <label class="text-[10px] uppercase font-bold text-dorado mb-1" title="Déjalo vacío para ver todos los registros del evento. Ponlo si quieres ver solo la tanda de tarjetas activa (ver 'Lote activo' en Juego Presencial).">
+            Lote (opcional)
+          </label>
+          <input id="input-lote" type="text" placeholder="Ej: L1735142400000"
+            class="bg-moradoOscuro border border-cremaClara/20 rounded-lg px-3 py-2 text-sm text-cremaClara outline-none">
+        </div>
+        <button onclick="cargarRegistros()"
+          class="px-4 py-2.5 bg-naranja hover:brightness-110 text-cremaClara font-bold rounded-xl text-sm shadow-lg transition">
+          🔄 Actualizar
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between mt-4 flex-wrap gap-2">
+        <span id="estado-carga" class="text-xs text-purple-300">Cargando registros...</span>
+        <label class="flex items-center gap-2 text-xs text-cremaClara/70 cursor-pointer">
+          <input id="chk-autorefresh" type="checkbox" checked class="w-3.5 h-3.5 accent-naranja">
+          Auto-actualizar cada 7s
+        </label>
+      </div>
+    </div>
+
+    <!-- EXPORTAR A GOOGLE SHEETS PARA EL CLIENTE -->
+    <div class="bg-moradoOscuro/90 border border-cremaClara/10 rounded-2xl p-6 shadow-xl mt-4">
+      <h3 class="font-display font-black text-sm mb-1">📤 Hoja para el cliente</h3>
+      <p class="text-xs text-cremaClara/70 mb-3">Genera una hoja nueva en Google Sheets con todos los registros del evento, y comparte el link con tu cliente.</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <button onclick="generarHojaCliente()" id="btn-exportar"
+          class="px-4 py-2.5 bg-morado hover:brightness-125 text-cremaClara font-bold rounded-xl text-sm shadow-lg transition">
+          📤 Generar registro
+        </button>
+        <span id="estado-exportar" class="text-xs text-purple-300"></span>
+      </div>
+      <div id="bloque-link" class="hidden mt-3 flex items-center gap-2 bg-moradoOscuro border border-dorado/50 rounded-lg px-3 py-2">
+        <input id="input-link-hoja" type="text" readonly
+          class="flex-1 bg-transparent text-xs text-cremaClara outline-none">
+        <button onclick="copiarLinkHoja()" class="px-3 py-1.5 bg-dorado/90 hover:bg-dorado text-moradoOscuro text-xs font-bold rounded-lg transition">
+          Copiar link
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA DE REGISTRADOS -->
+  <div class="max-w-6xl mx-auto px-4 pb-16">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-display font-black text-base">👥 Registrados</h3>
+      <span id="contador-registrados" class="text-sm font-bold text-dorado">0</span>
+    </div>
+    <div id="lista-registrados" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      webhookListarRegistrosURL: 'https://flujos.9magenciacreativa.com/webhook/bingo-listar',
+      webhookExportarURL: 'https://flujos.9magenciacreativa.com/webhook/bingo-exportar',
+    };
+
+    let temporizadorAutoRefresh = null;
+
+    function pintarRegistrados(lista) {
+      const contenedor = document.getElementById('lista-registrados');
+      const contador = document.getElementById('contador-registrados');
+      contador.textContent = lista.length;
+
+      if (lista.length === 0) {
+        contenedor.innerHTML = '<p class="text-sm text-cremaClara/60 col-span-full text-center py-8">Aún no hay nadie registrado.</p>';
+        return;
+      }
+
+      const ordenada = [...lista].sort((a, b) => Number(a.idTarjeta) - Number(b.idTarjeta));
+      contenedor.innerHTML = ordenada.map(r => `
+        <div class="bg-moradoOscuro/90 border border-cremaClara/10 rounded-xl px-4 py-3 shadow flex items-center gap-3">
+          <span class="font-display font-black text-dorado text-sm">#${String(r.idTarjeta).padStart(4, '0')}</span>
+          <span class="text-sm text-cremaClara truncate">${r.nombre || 'Sin nombre'}</span>
+        </div>
+      `).join('');
+    }
+
+    async function cargarRegistros() {
+      const estado = document.getElementById('estado-carga');
+      const evento = document.getElementById('input-evento').value.trim();
+      const lote = document.getElementById('input-lote').value.trim();
+
+      if (!evento) {
+        estado.textContent = 'Escribe el nombre del evento para buscar registros.';
+        return;
+      }
+
+      try {
+        const url = `${CONFIG.webhookListarRegistrosURL}?evento=${encodeURIComponent(evento)}&lote=${encodeURIComponent(lote)}`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        if (!Array.isArray(data)) throw new Error('Formato inesperado');
+
+        pintarRegistrados(data);
+        const ahora = new Date().toLocaleTimeString('es-CO');
+        estado.textContent = `✅ Actualizado a las ${ahora}`;
+      } catch (e) {
+        estado.textContent = '⚠️ No se pudo conectar con el servidor de registros. Reintentando...';
+      }
+    }
+
+    function reprogramarAutoRefresh() {
+      if (temporizadorAutoRefresh) clearInterval(temporizadorAutoRefresh);
+      const activo = document.getElementById('chk-autorefresh').checked;
+      if (activo) {
+        temporizadorAutoRefresh = setInterval(cargarRegistros, 7000);
+      }
+    }
+
+    async function generarHojaCliente() {
+      const evento = document.getElementById('input-evento').value.trim();
+      const btn = document.getElementById('btn-exportar');
+      const estado = document.getElementById('estado-exportar');
+      const bloqueLink = document.getElementById('bloque-link');
+
+      if (!evento) {
+        estado.textContent = 'Escribe el nombre del evento primero.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+      estado.textContent = '';
+      bloqueLink.classList.add('hidden');
+
+      try {
+        const url = `${CONFIG.webhookExportarURL}?evento=${encodeURIComponent(evento)}`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        if (data.linkHoja) {
+          document.getElementById('input-link-hoja').value = data.linkHoja;
+          bloqueLink.classList.remove('hidden');
+        }
+        estado.textContent = `✅ Hoja generada: ${data.hoja || 'ver Google Sheets'}`;
+      } catch (e) {
+        estado.textContent = '⚠️ No se pudo generar la hoja. Intenta de nuevo.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📤 Generar registro';
+      }
+    }
+
+    function copiarLinkHoja() {
+      const input = document.getElementById('input-link-hoja');
+      input.select();
+      navigator.clipboard?.writeText(input.value).catch(() => {});
+      document.execCommand('copy');
+    }
+
+    document.getElementById('chk-autorefresh').addEventListener('change', reprogramarAutoRefresh);
+
+    window.onload = function () {
+      cargarRegistros();
+      reprogramarAutoRefresh();
+    };
+  </script>
+</body>
+</html>

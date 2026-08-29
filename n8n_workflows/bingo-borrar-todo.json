@@ -1,0 +1,60 @@
+{
+  "id": "bingo-borrar-todo-wf-0001",
+  "name": "Bingo - Borrar Todos los Registros (GET -> deleteRows, admin/uso manual)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "bingo-borrar-todo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5d1e6f2c-0000-4000-8000-000000000001",
+      "name": "Webhook Borrar Todo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "bingo-borrar-todo-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "deleteRows",
+        "dataTableId": { "__rl": true, "mode": "id", "value": "4jfby1bxzFbhu20T" },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            { "keyName": "id", "condition": "isNotEmpty" }
+          ]
+        },
+        "options": {
+          "dryRun": "={{ $json.query.dryRun === 'true' }}"
+        }
+      },
+      "id": "5d1e6f2c-0000-4000-8000-000000000002",
+      "name": "Borrar Todas las Filas",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"dryRun\": $('Webhook Borrar Todo').item.json.query.dryRun === 'true', \"filasAfectadas\": $input.all().length, \"filas\": $input.all().map(item => item.json) } }}",
+        "options": {}
+      },
+      "id": "5d1e6f2c-0000-4000-8000-000000000003",
+      "name": "Responder Borrar Todo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Borrar Todo": { "main": [[{ "node": "Borrar Todas las Filas", "type": "main", "index": 0 }]] },
+    "Borrar Todas las Filas": { "main": [[{ "node": "Responder Borrar Todo", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
