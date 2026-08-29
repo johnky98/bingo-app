@@ -55,16 +55,16 @@
     }
     .anim-nueva { animation: pulso 0.5s cubic-bezier(.2,.9,.3,1.2); }
 
-    @keyframes marquee-scroll-v {
-      from { transform: translateY(0); }
-      to { transform: translateY(-50%); }
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
-    .marquee-track-v {
-      animation: marquee-scroll-v 20s linear infinite;
+    .marquee-track {
+      animation: marquee-scroll 22s linear infinite;
     }
-    .marquee-mask-v {
-      -webkit-mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
-      mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+    .marquee-mask {
+      -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
     }
 
     #modal-dibujo { backdrop-filter: blur(3px); }
@@ -163,7 +163,7 @@
   </div>
 
   <!-- CONTENEDOR PRINCIPAL DEL JUEGO -->
-  <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+  <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
     <!-- COLUMNA IZQUIERDA: CONTROLES & HISTORIAL -->
     <div class="lg:col-span-5 flex flex-col items-center space-y-6 text-center pt-4">
@@ -199,20 +199,24 @@
       </div>
 
       <!-- PATROCINADORES: se muestran en vivo mientras se juega -->
-      <div class="w-full max-w-sm flex-1 flex flex-col pt-4 border-t border-purple-900/50 min-h-[220px]">
+      <div class="w-full max-w-sm pt-4 border-t border-purple-900/50">
         <h3 class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-2">Nuestros Patrocinadores</h3>
-        <div class="marquee-mask-v relative flex-1 overflow-hidden rounded-2xl bg-brandCard/60 border border-purple-900/30">
-          <div class="marquee-track-v h-max flex flex-col items-center gap-6 py-6">
-            <img src="../assets/patrocinadores/decor-arte.jpeg" alt="Decor Arte" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/laundry-celeste.jpeg" alt="Laundry Celeste" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/shark-store.jpeg" alt="Shark Store" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/torayavision.jpeg" alt="Torayavision" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/dulce-encanto.jpeg" alt="Dulce Encanto" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/decor-arte.jpeg" alt="" aria-hidden="true" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/laundry-celeste.jpeg" alt="" aria-hidden="true" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/shark-store.jpeg" alt="" aria-hidden="true" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/torayavision.jpeg" alt="" aria-hidden="true" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
-            <img src="../assets/patrocinadores/dulce-encanto.jpeg" alt="" aria-hidden="true" class="h-20 w-auto max-w-[80%] rounded-lg shadow-lg object-contain">
+        <div class="marquee-mask overflow-hidden w-full">
+          <div class="marquee-track flex items-center w-max">
+            <div class="flex items-center gap-6 pr-6">
+              <img src="../assets/patrocinadores/decor-arte.jpeg" alt="Decor Arte" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/laundry-celeste.jpeg" alt="Laundry Celeste" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/shark-store.jpeg" alt="Shark Store" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/torayavision.jpeg" alt="Torayavision" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/dulce-encanto.jpeg" alt="Dulce Encanto" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+            </div>
+            <div class="flex items-center gap-6 pr-6" aria-hidden="true">
+              <img src="../assets/patrocinadores/decor-arte.jpeg" alt="" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/laundry-celeste.jpeg" alt="" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/shark-store.jpeg" alt="" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/torayavision.jpeg" alt="" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+              <img src="../assets/patrocinadores/dulce-encanto.jpeg" alt="" class="h-12 w-auto rounded-lg shadow-lg object-contain">
+            </div>
           </div>
         </div>
       </div>
@@ -682,10 +686,14 @@
     }
 
     function reiniciarJuego() {
-      if (confirm("¿Deseas reiniciar el tablero de balotas?")) {
+      if (confirm("¿Deseas reiniciar el tablero de balotas? Esto también borra el historial de ganadores.")) {
         bolasCantadas = [];
         actualizarTableroUI();
         guardarBolasCantadas();
+
+        historialGanadores = [];
+        guardarHistorialGanadores();
+        renderHistorialGanadores();
       }
     }
 
