@@ -953,12 +953,11 @@
 
       const nombreExistente = await buscarNombreRegistradoEnServidor(datos.p, datos.lote);
       if (nombreExistente) {
-        // Ya la registró alguien más (desde otro celular): no mostramos el
-        // formulario de nuevo, para no crear un segundo nombre sobre la misma
-        // tabla. Se marca localmente para no repetir la consulta cada vez.
-        marcarTarjetaRegistrada(codigo, { nombre: nombreExistente, registradoDesdeOtroDispositivo: true });
+        // Ya la registró alguien más (desde otro celular): se bloquea. No se
+        // muestra el formulario (evita un segundo nombre sobre la misma tabla)
+        // ni el cartón (evita jugar con la tabla de otra persona). No se
+        // guarda nada local, para que el bloqueo se mantenga en cada visita.
         mostrarAvisoTablaYaRegistrada(nombreExistente);
-        renderizarCartonJugador(datos, codigo);
         return;
       }
 
@@ -968,8 +967,8 @@
     function mostrarAvisoTablaYaRegistrada(nombre) {
       const aviso = document.getElementById('aviso-tabla-ya-registrada');
       if (!aviso) return;
-      aviso.textContent = `✅ Esta tabla ya está registrada a nombre de: ${nombre}`;
-      aviso.classList.remove('hidden');
+      aviso.textContent = `🔒 Esta tabla ya está registrada a nombre de ${nombre}. Pide al presentador otra tabla para poder jugar.`;
+      aviso.className = 'w-full text-sm text-amber-100 bg-amber-900/40 border border-amber-500/50 rounded-xl px-4 py-4 mb-3 text-center leading-relaxed';
     }
 
     // ============================================================
